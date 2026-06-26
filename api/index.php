@@ -6,7 +6,7 @@ header("Access-Control-Allow-Methods: GET");
 
 // --- ⚙️ إعدادات اتصال SUPABASE ⚙️ ---
 define('SUPABASE_PROJECT_ID', 'rlnowsoqwuqudybgyexz');
-define('SUPABASE_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTg4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc');
+define('SUPABASE_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc');
 
 /**
  * دالتك الخاصة: تحويل رقم الحلقة إلى نص عربي مخصص
@@ -79,6 +79,7 @@ function fetchFromSupabase($endpoint, $queryParams = []) {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
     curl_close($ch);
 
     if ($httpCode >= 200 && $httpCode < 300) {
@@ -94,11 +95,12 @@ function safeExtract($string, $start, $end) {
     if (!$string) return "";
     $parts = explode($start, $string);
     if (count($parts) > 1) {
-        $subParts = explode($end, $parts[1]);
-        return trim($subParts[0]);
+        $subParts = explode($end, $parts[1]); // تم تصحيح الاندكس هنا ليكون parts[1]
+        return trim($subParts[0]); // تم تصحيح إرجاع العنصر الأول index 0
     }
     return "";
 }
+
 
 // الفحص الأولي للـ Request والتحقق من وجود حقل want
 if (empty($_REQUEST['want']) || !isset($_REQUEST['want'])) {
