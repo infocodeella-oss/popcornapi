@@ -94,11 +94,12 @@ function safeExtract($string, $start, $end) {
     if (!$string) return "";
     $parts = explode($start, $string);
     if (count($parts) > 1) {
-        $subParts = explode($end, $parts[1]);
-        return trim($subParts[0]);
+        $subParts = explode($end, $parts[1]); // تم تصحيح أخذ الجزء الثاني بعد كلمة البداية
+        return trim($subParts[0]); // تم تصحيح أخذ الجزء الأول قبل كلمة النهاية
     }
     return "";
 }
+
 
 // الفحص الأولي للـ Request والتحقق من وجود حقل want
 if (empty($_REQUEST['want']) || !isset($_REQUEST['want'])) {
@@ -260,7 +261,8 @@ if ($want == "series") {
 
         $seasonText = safeExtract($fullTitle, "الموسم", "الحلقة");
         $episodeRaw = safeExtract($fullTitle, "الحلقة", "مترجمة");
-        $episodeNum = (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT);
+        // تأمين جلب الأرقام فقط من النص المستخرج
+        $episodeNum = !empty($episodeRaw) ? (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT) : 0; 
 
         $result[] = [
             'title' => trim($seriesTitle),
@@ -316,7 +318,9 @@ if ($want == 'search_series') {
 
         $seasonText = safeExtract($fullTitle, "الموسم", "الحلقة");
         $episodeRaw = safeExtract($fullTitle, "الحلقة", "مترجمة");
-        $episodeNum = (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT);
+        // تأمين جلب الأرقام فقط من النص المستخرج
+        $episodeNum = !empty($episodeRaw) ? (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT) : 0; 
+
 
         $result[] = [
             'title' => trim($seriesTitle),
