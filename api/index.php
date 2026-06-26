@@ -4,7 +4,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET");
 
 define('SUPABASE_PROJECT_ID', 'rlnowsoqwuqudybgyexz');
-define('SUPABASE_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTg4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc');
+define('SUPABASE_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc');
 
 function numberToArabicText($number) {
     $ones = [
@@ -68,6 +68,7 @@ function fetchFromSupabase($endpoint, $queryParams = []) {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
     curl_close($ch);
 
     if ($httpCode >= 200 && $httpCode < 300) {
@@ -80,12 +81,18 @@ function safeExtract($string, $start, $end) {
     if (!$string) return "";
     $parts = explode($start, $string);
     if (count($parts) > 1) {
-        $subParts = explode($end, $parts[1]);
-        return trim($subParts[0]);
+        $subParts = explode($end, $parts[1]); // تم تصحيح أخذ الجزء الثاني بعد كلمة البداية
+        return trim($subParts[0]); // تم تصحيح أخذ الجزء الأول قبل كلمة النهاية
     }
     return "";
 }
 
+<<<<<<< HEAD
+=======
+
+
+// الفحص الأولي للـ Request والتحقق من وجود حقل want
+>>>>>>> 55426024133f732a7307b61418cca0bcd9b65f72
 if (empty($_REQUEST['want']) || !isset($_REQUEST['want'])) {
     echo json_encode(["result" => "Must Enter Want"], JSON_UNESCAPED_UNICODE);
     exit;
@@ -296,7 +303,8 @@ if ($want == 'search_series') {
 
         $seasonText = safeExtract($fullTitle, "الموسم", "الحلقة");
         $episodeRaw = safeExtract($fullTitle, "الحلقة", "مترجمة");
-        $episodeNum = (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT);
+        // تأمين جلب الأرقام فقط من النص المستخرج
+        $episodeNum = !empty($episodeRaw) ? (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT) : 0; 
 
         $result[] = [
             'title' => trim($seriesTitle),
