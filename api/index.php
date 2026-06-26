@@ -1,16 +1,11 @@
 <?php
-// إعداد الرؤوس البرمجية لإرجاع البيانات بصيغة JSON والسماح بالاتصال الخارجي (CORS)
 header('Content-Type: application/json; charset=utf-8');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET");
 
-// --- ⚙️ إعدادات اتصال SUPABASE ⚙️ ---
 define('SUPABASE_PROJECT_ID', 'rlnowsoqwuqudybgyexz');
 define('SUPABASE_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTg4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc');
 
-/**
- * دالتك الخاصة: تحويل رقم الحلقة إلى نص عربي مخصص
- */
 function numberToArabicText($number) {
     $ones = [
         1 => 'الأولى',
@@ -31,9 +26,6 @@ function numberToArabicText($number) {
     return $number . '';
 }
 
-/**
- * دالتك الخاصة: تحويل نص الموسم العربي إلى رقم صحيح
- */
 function arabicTextToNumber($text) {
     $numbers = [
         'الاول' => 1,
@@ -60,9 +52,6 @@ function arabicTextToNumber($text) {
     return $numbers[$text] ?? null;
 }
 
-/**
- * دالة مركزية ومُحسّنة لجلب البيانات من Supabase باستخدام cURL بشكل سريع وآمن
- */
 function fetchFromSupabase($endpoint, $queryParams = []) {
     $queryString = http_build_query($queryParams);
     $url = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $endpoint . ($queryString ? "?" . $queryString : "");
@@ -87,9 +76,6 @@ function fetchFromSupabase($endpoint, $queryParams = []) {
     return [];
 }
 
-/**
- * دالة مساعدة آمنة لاستخراج النصوص وتفكيك محتوى العناوين (بديلة لـ Explode المتقدمة)
- */
 function safeExtract($string, $start, $end) {
     if (!$string) return "";
     $parts = explode($start, $string);
@@ -100,7 +86,6 @@ function safeExtract($string, $start, $end) {
     return "";
 }
 
-// الفحص الأولي للـ Request والتحقق من وجود حقل want
 if (empty($_REQUEST['want']) || !isset($_REQUEST['want'])) {
     echo json_encode(["result" => "Must Enter Want"], JSON_UNESCAPED_UNICODE);
     exit;
@@ -112,7 +97,6 @@ $want = $_REQUEST['want'];
 // ================================= MOVIES ================================ //
 // ========================================================================= //
 
-// 1. جلب كل الأفلام بـ Limit محدد
 if ($want == "movies") {
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 0;
 
@@ -152,7 +136,6 @@ if ($want == "movies") {
     exit;
 }
 
-// 2. البحث في الأفلام بالاسم
 if ($want == 'search_movies') {
     $search = isset($_REQUEST['search']) ? trim($_REQUEST['search']) : "";
 
@@ -191,7 +174,6 @@ if ($want == 'search_movies') {
     exit;
 }
 
-// 3. فلترة الأفلام عن طريق التصنيف أو القسم
 if ($want == 'filter_movies') {
     $filter = isset($_REQUEST['filter']) ? trim($_REQUEST['filter']) : "";
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 20;
@@ -225,7 +207,8 @@ if ($want == 'filter_movies') {
                 "q720" => $row['download_720'] ?? "",
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
-            ]
+            ],
+            'added_at' => $row['created_at']
         ];
     }
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
@@ -235,7 +218,6 @@ if ($want == 'filter_movies') {
 // ================================= SERIES ================================ //
 // ========================================================================= //
 
-// 4. جلب كل المسلسلات بـ Limit محدد
 if ($want == "series") {
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 0;
 
@@ -254,7 +236,6 @@ if ($want == "series") {
     foreach ($data as $row) {
         $fullTitle = $row['title'] ?? "";
         
-        // تفكيك محتوى العنوان مثل المنطق القديم
         $seriesTitle = safeExtract($fullTitle, "مسلسل", "الموسم");
         if(empty($seriesTitle)) $seriesTitle = $fullTitle;
 
@@ -292,7 +273,6 @@ if ($want == "series") {
     exit;
 }
 
-// 5. البحث في المسلسلات بالاسم
 if ($want == 'search_series') {
     $search = isset($_REQUEST['search']) ? trim($_REQUEST['search']) : "";
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 20;
@@ -348,5 +328,4 @@ if ($want == 'search_series') {
     exit;
 }
 
-// في حال تم طلب خيار غير مبرمج
 echo json_encode(["result" => "Invalid Command Query or Action Method"], JSON_UNESCAPED_UNICODE);
