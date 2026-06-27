@@ -1,16 +1,11 @@
 <?php
-// إعداد الرؤوس البرمجية لإرجاع البيانات بصيغة JSON والسماح بالاتصال الخارجي (CORS)
 header('Content-Type: application/json; charset=utf-8');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET");
 
-// --- ⚙️ إعدادات اتصال SUPABASE ⚙️ ---
 define('SUPABASE_PROJECT_ID', 'rlnowsoqwuqudybgyexz');
 define('SUPABASE_TOKEN', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc');
 
-/**
- * دالتك الخاصة: تحويل رقم الحلقة إلى نص عربي مخصص
- */
 function numberToArabicText($number) {
     $ones = [
         1 => 'الأولى',
@@ -31,9 +26,6 @@ function numberToArabicText($number) {
     return $number . '';
 }
 
-/**
- * دالتك الخاصة: تحويل نص الموسم العربي إلى رقم صحيح
- */
 function arabicTextToNumber($text) {
     $numbers = [
         'الاول' => 1,
@@ -60,9 +52,6 @@ function arabicTextToNumber($text) {
     return $numbers[$text] ?? null;
 }
 
-/**
- * دالة مركزية ومُحسّنة لجلب البيانات من Supabase باستخدام cURL بشكل سريع وآمن
- */
 function fetchFromSupabase($endpoint, $queryParams = []) {
     $queryString = http_build_query($queryParams);
     $url = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $endpoint . ($queryString ? "?" . $queryString : "");
@@ -88,9 +77,6 @@ function fetchFromSupabase($endpoint, $queryParams = []) {
     return [];
 }
 
-/**
- * دالة مساعدة آمنة لاستخراج النصوص وتفكيك محتوى العناوين (بديلة لـ Explode المتقدمة)
- */
 function safeExtract($string, $start, $end) {
     if (!$string) return "";
     $parts = explode($start, $string);
@@ -103,13 +89,205 @@ function safeExtract($string, $start, $end) {
 
 
 
-// الفحص الأولي للـ Request والتحقق من وجود حقل want
 if (empty($_REQUEST['want']) || !isset($_REQUEST['want'])) {
     echo json_encode(["result" => "Must Enter Want"], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 $want = $_REQUEST['want'];
+
+// ========================================================================= //
+// ================================= Statics =============================== //
+// ========================================================================= //
+if ($want == "statics") {
+    
+    $today_start = date("Y-m-d 00:00:00");
+    $yesterday_start = date("Y-m-d 00:00:00", strtotime("-1 day"));
+    $yesterday_end = date("Y-m-d 23:59:59", strtotime("-1 day"));
+
+    $tables = ["movies", "series"];
+    $final_report = [];
+    $total_library = 0;
+
+    foreach ($tables as $table) {
+        
+        $url_all = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $table . "?select=id";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url_all);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["apikey: " . SUPABASE_TOKEN, "Authorization: Bearer " . SUPABASE_TOKEN, "Prefer: count=exact"]);
+        $res_all = curl_exec($ch);
+        curl_close($ch);
+        
+        $count_all = 0;
+        if (preg_match('/Content-Range: .+\/(\d+)/i', $res_all, $matches)) {
+            $count_all = (int)$matches[1];
+        }
+        $total_library += $count_all;
+        $final_report["total_" . $table] = $count_all;
+
+        $url_today = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $table . "?select=id&created_at=gte." . urlencode($today_start);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url_today);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["apikey: " . SUPABASE_TOKEN, "Authorization: Bearer " . SUPABASE_TOKEN, "Prefer: count=exact"]);
+        $res_today = curl_exec($ch);
+        curl_close($ch);
+
+        $count_today = 0;
+        if (preg_match('/Content-Range: .+\/(\d+)/i', $res_today, $matches)) {
+            $count_today = (int)$matches[1];
+        }
+        $final_report[$table . "_added_today"] = $count_today;
+        $url_yesterday = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $table . "?select=id&created_at=gte." . urlencode($yesterday_start) . "&created_at=lte." . urlencode($yesterday_end);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url_yesterday);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["apikey: " . SUPABASE_TOKEN, "Authorization: Bearer " . SUPABASE_TOKEN, "Prefer: count=exact"]);
+        $res_yesterday = curl_exec($ch);
+        curl_close($ch);
+
+        $count_yesterday = 0;
+        if (preg_match('/Content-Range: .+\/(\d+)/i', $res_yesterday, $matches)) {
+            $count_yesterday = (int)$matches;
+        }
+        $final_report[$table . "_added_yesterday"] = $count_yesterday;
+    }
+
+    $output = [
+        "summary" => [
+            "total_library_items" => $total_library,
+            "total_movies" => $final_report["total_movies"],
+            "total_series_episodes" => $final_report["total_series"],
+            "database_status" => "Healthy & Connected",
+            "server_time" => date("Y-m-d H:i:s")
+        ],
+        "movies_activity" => [
+            "total" => $final_report["total_movies"],
+            "added_today" => $final_report["movies_added_today"],
+            "added_yesterday" => $final_report["movies_added_yesterday"]
+        ],
+        "series_activity" => [
+            "total" => $final_report["total_series"],
+            "added_today" => $final_report["series_added_today"],
+            "added_yesterday" => $final_report["series_added_yesterday"]
+        ]
+    ];
+
+    echo json_encode(["result" => $output], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+// 7. جلب تفاصيل المسلسل والمواسم والحلقات بالكامل عن طريق معرف الحلقة (ID)
+if ($want == "series_details") {
+    $series_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
+
+    if ($series_id <= 0) {
+        echo json_encode(["result" => "Valid Series ID Is Required"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    // الخطوة 1: جلب الحلقة المطلوبة لمعرفة اسم المسلسل الأصلي
+    $single_episode = fetchFromSupabase("series", [
+        "id" => "eq." . $series_id,
+        "limit" => 1
+    ]);
+
+    if (empty($single_episode)) {
+        echo json_encode(["result" => "Series or Episode Not Found"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $target_episode = $single_episode[0];
+    $fullTitle = $target_episode['title'] ?? "";
+    
+    // استخراج اسم السلسلة الأساسي بدون الموسم والحلقة
+    $clean_series_name = safeExtract($fullTitle, "مسلسل", "الموسم");
+    if (empty($clean_series_name)) {
+        $clean_series_name = $fullTitle;
+    }
+
+    // الخطوة 2: جلب كل الحلقات والمواسم التي تشترك في نفس اسم المسلسل
+    $all_episodes = fetchFromSupabase("series", [
+        "title" => "ilike.*" . trim($clean_series_name) . "*",
+        "order" => "id.asc" // ترتيب تصاعدي من الحلقة الأولى للأحدث
+    ]);
+
+    // مصفوفة ذكية لتجميع المواسم والحلقات وتجنب التكرار
+    $seasons_navigation = [];
+    $series_metadata = [
+        "series_title" => trim($clean_series_name),
+        "cover" => $target_episode['cover'] ?? "",
+        "story" => $target_episode['story'] ?? "",
+        "actors" => $target_episode['actors'] ?? "",
+        "types" => $target_episode['types'] ?? "",
+        "country" => $target_episode['country'] ?? "غير معروف",
+        "year" => isset($target_episode['year']) ? (int)$target_episode['year'] : 0,
+        "rate" => isset($target_episode['rate']) ? (float)$target_episode['rate'] : 0.0,
+    ];
+        // الخطوة 3: فرز وترتيب الحلقات داخل المواسم ديناميكياً مع حماية المطابقة التامة
+    foreach ($all_episodes as $row) {
+        $rowFullTitle = $row['title'] ?? "";
+        
+        // 1. استخراج اسم المسلسل الحالي للحلقة لفحصه ومطابقته
+        $current_series_title = safeExtract($rowFullTitle, "مسلسل", "الموسم");
+        if(empty($current_series_title)) {
+            $current_series_title = $rowFullTitle;
+        }
+
+        // 🌟 الشرط السحري: منع تداخل المسلسلات ذات الأسماء المتشابهة
+        // إذا كان اسم المسلسل المستخرج لا يطابق الاسم المستهدف تماماً، يتم تخطي الحلقة فوراً
+        if (trim($current_series_title) !== trim($clean_series_name)) {
+            continue; 
+        }
+        
+        // 2. استخراج اسم الموسم ورقم الحلقة باستخدام دالاتك المدمجة
+        $seasonText = safeExtract($rowFullTitle, "الموسم", "الحلقة");
+        $seasonNum = arabicTextToNumber(trim($seasonText)) ?: 1; // افتراضي 1 لو لم يُذكر
+        
+        $episodeRaw = safeExtract($rowFullTitle, "الحلقة", "مترجمة");
+        $episodeNum = (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT);
+        
+        // إنشاء الموسم داخل مصفوفة التنقل لو لم يكن موجوداً مسبقاً
+        if (!isset($seasons_navigation[$seasonNum])) {
+            $seasons_navigation[$seasonNum] = [
+                "season_number" => $seasonNum,
+                "season_text" => "الموسم " . (empty($seasonText) ? $seasonNum : $seasonText),
+                "episodes" => []
+            ];
+        }
+        
+        // إضافة الحلقة الحالية داخل مصفوفة الحلقات الخاصة بموسمها
+        $seasons_navigation[$seasonNum]["episodes"][] = [
+            "episode_id" => (int)$row['id'],
+            "episode_number" => $episodeNum,
+            "text" => numberToArabicText($episodeNum),
+            "last" => str_contains($rowFullTitle, "والاخيرة"),
+            "quality" => $row['quality'] ?? "",
+            "downloads" => [
+                "q1080" => $row['download_1080'] ?? "",
+                "q720" => $row['download_720'] ?? "",
+                "q480" => $row['download_480'] ?? "",
+                "q240" => $row['download_240'] ?? "",
+            ]
+        ];
+    }
+
+    // إعادة ترتيب مصفوفة المواسم تصاعدياً (من الموسم الأول إلى الأحدث)
+    ksort($seasons_navigation);
+    
+    // تحويل مصفوفة المواسم المفرزة إلى قائمة مرتبة متناسقة مع الـ JSON
+    $series_metadata["seasons"] = array_values($seasons_navigation);
+
+    echo json_encode(["result" => $series_metadata], JSON_UNESCAPED_UNICODE);
+    exit;
+}
 
 // ========================================================================= //
 // ================================= MOVIES ================================ //
@@ -269,6 +447,7 @@ if ($want == "series") {
         $episodeNum = (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT);
 
         $result[] = [
+            'id' => (int) $row['id'],
             'title' => trim($seriesTitle),
             'season' => [
                 "number" => arabicTextToNumber(trim($seasonText)),
@@ -276,7 +455,8 @@ if ($want == "series") {
             ],
             'episode' => [
                 "number" => $episodeNum,
-                "text" => numberToArabicText($episodeNum)
+                "text" => numberToArabicText($episodeNum),
+                "last" => str_contains($fullTitle, "والاخيرة")
             ],
             'cover' => $row['cover'] ?? "",
             'story' => $row['story'] ?? "",
@@ -299,7 +479,6 @@ if ($want == "series") {
     exit;
 }
 
-// 5. البحث في المسلسلات بالاسم
 if ($want == 'search_series') {
     $search = isset($_REQUEST['search']) ? trim($_REQUEST['search']) : "";
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 20;
@@ -327,6 +506,7 @@ if ($want == 'search_series') {
         $episodeNum = !empty($episodeRaw) ? (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT) : 0; 
 
         $result[] = [
+            'id' => (int) $row['id'],
             'title' => trim($seriesTitle),
             'season' => [
                 "number" => arabicTextToNumber(trim($seasonText)),
@@ -334,7 +514,8 @@ if ($want == 'search_series') {
             ],
             'episode' => [
                 "number" => $episodeNum,
-                "text" => numberToArabicText($episodeNum)
+                "text" => numberToArabicText($episodeNum),
+                "last" => str_contains($fullTitle, "والاخيرة")
             ],
             'cover' => $row['cover'] ?? "",
             'story' => $row['story'] ?? "",
@@ -357,5 +538,4 @@ if ($want == 'search_series') {
     exit;
 }
 
-// في حال تم طلب خيار غير مبرمج
 echo json_encode(["result" => "Invalid Command Query or Action Method"], JSON_UNESCAPED_UNICODE);
