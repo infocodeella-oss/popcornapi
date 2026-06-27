@@ -148,7 +148,8 @@ if ($want == "movies") {
                 "q720" => $row['download_720'] ?? "",
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
-            ]
+            ],
+            "added_at" => $row['created_at']
         ];
     }
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
@@ -187,7 +188,8 @@ if ($want == 'search_movies') {
                 "q720" => $row['download_720'] ?? "",
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
-            ]
+            ],
+            "added_at" => $row['created_at']
         ];
     }
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
@@ -228,7 +230,8 @@ if ($want == 'filter_movies') {
                 "q720" => $row['download_720'] ?? "",
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
-            ]
+            ],
+            "added_at" => $row['created_at']
         ];
     }
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
@@ -346,7 +349,8 @@ if ($want == 'search_series') {
                 "q720" => $row['download_720'] ?? "",
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
-            ]
+            ],
+            "added_at" => $row['created_at']
         ];
     }
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
