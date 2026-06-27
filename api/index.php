@@ -539,3 +539,180 @@ if ($want == 'search_series') {
 }
 
 echo json_encode(["result" => "Invalid Command Query or Action Method"], JSON_UNESCAPED_UNICODE);
+
+
+// ========================================================================= //
+// ========================== INSERT & UPDATE ROUTES ======================= //
+// ========================================================================= //
+
+/**
+ * دالة مساعدة لإرسال طلبات الإدخال (POST) والتعديل (PUT) إلى Supabase
+ */
+function sendToSupabaseAPI($endpoint, $method, $payload) {
+    $url = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $endpoint;
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: " . SUPABASE_TOKEN,
+        "Authorization: Bearer " . SUPABASE_TOKEN,
+        "Content-Type: application/json",
+        "Prefer: return=minimal"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return [
+        "status_code" => $httpCode,
+        "response" => json_decode($response, true) ?: $response
+    ];
+}
+
+// 8. إضافة مسلسل جديد (POST) -> ?want=add_series
+if ($want == "add_series" && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    // جلب البيانات الخام المرسلة بصيغة JSON
+    $inputData = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+
+    if (empty($inputData['title'])) {
+        echo json_encode(["result" => "Title is required"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $payload = [
+        "title" => $inputData['title'] ?? null,
+        "rate" => $inputData['rate'] ?? null,
+        "story" => $inputData['story'] ?? null,
+        "types" => $inputData['types'] ?? null,
+        "quality" => $inputData['quality'] ?? null,
+        "year" => $inputData['year'] ?? null,
+        "language" => $inputData['language'] ?? null,
+        "country" => $inputData['country'] ?? null,
+        "actors" => $inputData['actors'] ?? null,
+        "cover" => $inputData['cover'] ?? null,
+        "download_1080" => $inputData['download_1080'] ?? null,
+        "download_720" => $inputData['download_720'] ?? null,
+        "download_480" => $inputData['download_480'] ?? null,
+        "download_240" => $inputData['download_240'] ?? null,
+        "episode_url" => $inputData['episode_url'] ?? null,
+        "custome_cover" => $inputData['custome_cover'] ?? null,
+        "custome_title_image" => $inputData['custome_title_image'] ?? null
+    ];
+
+    $res = sendToSupabaseAPI("series", "POST", $payload);
+
+    if ($res['status_code'] >= 200 && $res['status_code'] < 300) {
+        echo json_encode(["result" => "Series added successfully"], JSON_UNESCAPED_UNICODE);
+    } elseif ($res['status_code'] == 409) {
+        echo json_encode(["result" => "Error: This series episode already exists"], JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(["result" => "Failed to add series", "error" => $res['response']], JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
+
+// 9. إضافة فيلم جديد (POST) -> ?want=add_movie
+if ($want == "add_movie" && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $inputData = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+
+    if (empty($inputData['title'])) {
+        echo json_encode(["result" => "Title is required"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $payload = [
+        "title" => $inputData['title'] ?? null,
+        "rate" => $inputData['rate'] ?? null,
+        "story" => $inputData['story'] ?? null,
+        "types" => $inputData['types'] ?? null,
+        "quality" => $inputData['quality'] ?? null,
+        "duration" => $inputData['duration'] ?? null,
+        "year" => $inputData['year'] ?? null,
+        "language" => $inputData['language'] ?? null,
+        "category" => $inputData['category'] ?? null,
+        "actors" => $inputData['actors'] ?? null,
+        "cover" => $inputData['cover'] ?? null,
+        "download_1080" => $inputData['download_1080'] ?? null,
+        "download_720" => $inputData['download_720'] ?? null,
+        "download_480" => $inputData['download_480'] ?? null,
+        "download_240" => $inputData['download_240'] ?? null,
+        "movie_url" => $inputData['movie_url'] ?? null,
+        "custome_cover" => $inputData['custome_cover'] ?? null,
+        "custome_title_image" => $inputData['custome_title_image'] ?? null
+    ];
+
+    $res = sendToSupabaseAPI("movies", "POST", $payload);
+
+    if ($res['status_code'] >= 200 && $res['status_code'] < 300) {
+        echo json_encode(["result" => "Movie added successfully"], JSON_UNESCAPED_UNICODE);
+    } elseif ($res['status_code'] == 409) {
+        echo json_encode(["result" => "Error: This movie already exists"], JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(["result" => "Failed to add movie", "error" => $res['response']], JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
+
+// 10. تعديل بيانات مسلسل (PUT / POST) -> ?want=update_series
+if ($want == "update_series") {
+    $inputData = json_decode(file_get_contents('php://input'), true) ?: $_REQUEST;
+    $id = isset($inputData['id']) ? intval($inputData['id']) : 0;
+
+    if ($id <= 0) {
+        echo json_encode(["result" => "Valid ID is required for update"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $payload = [];
+    $fields = ['title', 'rate', 'story', 'types', 'quality', 'year', 'language', 'country', 'actors', 'cover', 'download_1080', 'download_720', 'download_480', 'download_240', 'episode_url', 'custome_cover', 'custome_title_image'];
+    
+    // بناء مصفوفة البيانات ديناميكياً لتعديل الحقول المرسلة فقط دون تصفير الباقي
+    foreach ($fields as $field) {
+        if (isset($inputData[$field])) {
+            $payload[$field] = $inputData[$field];
+        }
+    }
+
+    $res = sendToSupabaseAPI("series?id=eq." . $id, "PATCH", $payload);
+
+    if ($res['status_code'] >= 200 && $res['status_code'] < 300) {
+        echo json_encode(["result" => "Series updated successfully"], JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(["result" => "Failed to update series", "error" => $res['response']], JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
+
+// 11. تعديل بيانات فيلم (PUT / POST) -> ?want=update_movie
+if ($want == "update_movie") {
+    $inputData = json_decode(file_get_contents('php://input'), true) ?: $_REQUEST;
+    $id = isset($inputData['id']) ? intval($inputData['id']) : 0;
+
+    if ($id <= 0) {
+        echo json_encode(["result" => "Valid ID is required for update"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $payload = [];
+    $fields = ['title', 'rate', 'story', 'types', 'quality', 'duration', 'year', 'language', 'category', 'actors', 'cover', 'download_1080', 'download_720', 'download_480', 'download_240', 'movie_url', 'custome_cover', 'custome_title_image'];
+    
+    foreach ($fields as $field) {
+        if (isset($inputData[$field])) {
+            $payload[$field] = $inputData[$field];
+        }
+    }
+
+    $res = sendToSupabaseAPI("movies?id=eq." . $id, "PATCH", $payload);
+
+    if ($res['status_code'] >= 200 && $res['status_code'] < 300) {
+        echo json_encode(["result" => "Movie updated successfully"], JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(["result" => "Failed to update movie", "error" => $res['response']], JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
