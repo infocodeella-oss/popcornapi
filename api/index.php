@@ -293,6 +293,126 @@ if ($want == "series_details") {
 // ================================= MOVIES ================================ //
 // ========================================================================= //
 
+// إندبوينت ذكية لجلب بيانات صف واحد فقط بالـ ID للأفلام أو المسلسلات
+if ($want == "get_by_id") {
+    $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
+    $table = (isset($_REQUEST['type']) && $_REQUEST['type'] == 'series') ? 'series' : 'movies';
+
+    if ($id <= 0) {
+        echo json_encode(["result" => "Valid ID is required"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $data = fetchFromSupabase($table, ["id" => "eq." . $id, "limit" => 1]);
+
+    if (!empty($data) && isset($data[0])) {
+        echo json_encode(["status" => "success", "data" => $data[0]], JSON_UNESCAPED_UNICODE);
+    } else {
+        echo json_encode(["status" => "error", "result" => "Item not found"], JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
+
+
+// Home Page
+if ($want == "home") {
+    $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 1;
+
+    if ($limit <= 0) {
+        echo json_encode(["result" => "Should Enter Valid Limit"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $dataMovies = fetchFromSupabase("movies", [
+        "select" => "*",
+        "limit" => $limit,
+        "cover"  => "neq.",
+        "order" => "id.desc"
+    ]);
+
+    $result = [];
+    $movies = [];
+    $series = [];
+
+    foreach ($dataMovies as $row) {
+        $movies[] = [
+            'id' => (int) $row['id'],
+            'title' => trim(str_replace(['فيلم', 'مترجم اون لاين - توب سينما'], '', $row['title'])),
+            'cover' => $row['cover'] ?? "",
+            'story' => $row['story'] ?? "",
+            'types' => $row['types'] ?? "",
+            'actors' => $row['actors'] ?? "",
+            'duration' => $row['duration'] ?? "",
+            'year' => isset($row['year']) ? (int)$row['year'] : 0,
+            'quality' => $row['quality'] ?? "",
+            'language' => $row['language'] ?? "",
+            'rate' => isset($row['rate']) ? (float)$row['rate'] : 0.0,
+            'downloads' => [
+                "q1080" => $row['download_1080'] ?? "",
+                "q720" => $row['download_720'] ?? "",
+                "q480" => $row['download_480'] ?? "",
+                "q240" => $row['download_240'] ?? "",
+            ],
+            "added_at" => $row['created_at']
+        ];
+    }
+
+    
+    $dataSeries = fetchFromSupabase("series", [
+        "select" => "*",
+        "limit" => $limit,
+        "cover"  => "neq.",
+        "order" => "id.desc"
+    ]);
+
+    foreach ($dataSeries as $row) {
+        $fullTitle = $row['title'] ?? "";
+        
+        // تفكيك محتوى العنوان مثل المنطق القديم
+        $seriesTitle = safeExtract($fullTitle, "مسلسل", "الموسم");
+        if(empty($seriesTitle)) $seriesTitle = $fullTitle;
+
+        $seasonText = safeExtract($fullTitle, "الموسم", "الحلقة");
+        $episodeRaw = safeExtract($fullTitle, "الحلقة", "مترجمة");
+        $episodeNum = (int) filter_var($episodeRaw, FILTER_SANITIZE_NUMBER_INT);
+
+        $series[] = [
+            'id' => (int) $row['id'],
+            'title' => trim($seriesTitle),
+            'season' => [
+                "number" => arabicTextToNumber(trim($seasonText)),
+                "text" => trim($seasonText),
+            ],
+            'episode' => [
+                "number" => $episodeNum,
+                "text" => numberToArabicText($episodeNum),
+                "last" => str_contains($fullTitle, "والاخيرة")
+            ],
+            'cover' => $row['cover'] ?? "",
+            'story' => $row['story'] ?? "",
+            'types' => $row['types'] ?? "",
+            'actors' => $row['actors'] ?? "",
+            'country' => $row['country'] ?? "غير معروف",
+            'year' => isset($row['year']) ? (int)$row['year'] : 0,
+            'quality' => $row['quality'] ?? "",
+            'rate' => isset($row['rate']) ? (float)$row['rate'] : 0.0,
+            'downloads' => [
+                "q1080" => $row['download_1080'] ?? "",
+                "q720" => $row['download_720'] ?? "",
+                "q480" => $row['download_480'] ?? "",
+                "q240" => $row['download_240'] ?? "",
+            ],
+            'added_at' => $row['created_at']
+        ];
+    }
+
+    $result['movies'] = $movies;
+    $result['series'] = $series;
+
+    echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 // 1. جلب كل الأفلام بـ Limit محدد
 if ($want == "movies") {
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 0;
@@ -305,6 +425,7 @@ if ($want == "movies") {
     $data = fetchFromSupabase("movies", [
         "select" => "*",
         "limit" => $limit,
+        "cover"  => "neq.",
         "order" => "id.desc"
     ]);
 
