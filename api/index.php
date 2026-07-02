@@ -495,6 +495,34 @@ if ($want == 'search_movies') {
     exit;
 }
 
+// Search Cafe
+if ($want == 'search_cafe') {
+    $search = isset($_REQUEST['search']) ? trim($_REQUEST['search']) : "";
+    $limit = isset($_REQUEST['limit']) ? trim($_REQUEST['limit']) : 20;
+
+    if (empty($search)) {
+        echo json_encode(["result" => "Search Text Is Required"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $data = fetchFromSupabase("cafe_series", [
+        "title" => "ilike.*" . $search . "*",
+        "limit" => $limit
+    ]);
+
+    $result = [];
+    foreach ($data as $row) {
+        $result[] = [
+            'title' => trim($row['title']),
+            'cover' => $row['cover'] ?? "",
+            "download" => $row['download_480'] ?? "",
+            "added_at" => $row['created_at']
+        ];
+    }
+    echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 // 3. فلترة الأفلام عن طريق التصنيف أو القسم
 if ($want == 'filter_movies') {
     $filter = isset($_REQUEST['filter']) ? trim($_REQUEST['filter']) : "";
@@ -658,6 +686,7 @@ if ($want == 'search_series') {
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
     exit;
 }
+
 
 echo json_encode(["result" => "Invalid Command Query or Action Method"], JSON_UNESCAPED_UNICODE);
 
