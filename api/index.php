@@ -432,6 +432,7 @@ if ($want == "movies") {
     $result = [];
     foreach ($data as $row) {
         $result[] = [
+            'id' => (int) $row['id'],
             'title' => trim(str_replace(['فيلم', 'مترجم اون لاين - توب سينما'], '', $row['title'])),
             'cover' => $row['cover'] ?? "",
             'story' => $row['story'] ?? "",
