@@ -275,7 +275,8 @@ if ($want == "series_details") {
                 "q720" => $row['download_720'] ?? "",
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
-            ]
+            ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
         ];
     }
 
@@ -352,6 +353,7 @@ if ($want == "home") {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             "added_at" => $row['created_at']
         ];
     }
@@ -401,6 +403,7 @@ if ($want == "home") {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             'added_at' => $row['created_at']
         ];
     }
@@ -518,6 +521,7 @@ if ($want == "movies") {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             "added_at" => $row['created_at']
         ];
     }
@@ -559,6 +563,7 @@ if ($want == 'search_movies') {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             "added_at" => $row['created_at']
         ];
     }
@@ -632,6 +637,7 @@ if ($want == 'filter_movies') {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             "added_at" => $row['created_at']
         ];
     }
@@ -695,6 +701,7 @@ if ($want == "series") {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             'added_at' => $row['created_at']
         ];
     }
@@ -754,6 +761,7 @@ if ($want == 'search_series') {
                 "q480" => $row['download_480'] ?? "",
                 "q240" => $row['download_240'] ?? "",
             ],
+            "watch" => str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080'])),
             "added_at" => $row['created_at']
         ];
     }
