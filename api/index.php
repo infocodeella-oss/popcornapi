@@ -313,7 +313,6 @@ if ($want == "get_by_id") {
     exit;
 }
 
-
 // Home Page
 if ($want == "home") {
     $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 1;
@@ -409,7 +408,77 @@ if ($want == "home") {
     $result['movies'] = $movies;
     $result['series'] = $series;
 
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
+
+// Ramadan 2026
+if ($want == "r2026") {
+    $limit = isset($_REQUEST['limit']) ? intval($_REQUEST['limit']) : 1;
+
+    if ($limit <= 0) {
+        echo json_encode(["result" => "Should Enter Valid Limit"], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $dataMovies = fetchFromSupabase("movies", [
+        "select" => "*",
+        "limit" => $limit,
+        "cover"  => "neq.",
+        "order" => "id.desc"
+    ]);
+
+    $result = [];
+
+    $r2026 = [];
+
+    $searchWords = [
+        "صحاب", "المداح", "سوق",
+        "راس الافعى", "حكاية نرجس", "اتنين غيرنا",
+        "بخمس ارواح", "وننسى اللي كان", "درش",
+        "مسلسل فرصة اخيرة", "مسلسل علي كلاي", "الكينج",
+        "الست موناليزا", "حد اقصى", "بابا وماما جيران",
+        "بيبو", "اولاد الراعي", "على قد الحب",
+        "المداح 6", "فن الحرب", "كلهم بيحبوا مودي",
+        "ن النسوة", "فخر الدلتا", "قطر صغنطوط",
+        "اللون الازرق", "هي كيميا", "سوا سوا",
+        "النص التاني", "افراج", "أب ولكن"
+    ]; 
+
+    $addedIds = [];
+
+    foreach ($searchWords as $word) {
+        
+        $searchResult = fetchFromSupabase("cafe_series", [
+            "select" => "*",
+            "title" => "ilike.*" . trim($word) . "*",
+            "order" => "id.desc", 
+            "limit" => 1
+        ]);
+
+        if (!empty($searchResult) && isset($searchResult[0])) {
+            $row = $searchResult[0];
+            
+            if (!in_array($row['id'], $addedIds)) {
+                $addedIds[] = $row['id'];
+                
+                $r2026[] = [
+                    'id' => (int) $row['id'],
+                    'title' => $row['title'],
+                    'cover' => $row['cover'] ?? "",
+                    'added_at' => $row['created_at']
+                ];
+            }
+        }
+    }
+
+    $result['r2026'] = $r2026;
+
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(["result" => $result], JSON_UNESCAPED_UNICODE);
+
     exit;
 }
 
