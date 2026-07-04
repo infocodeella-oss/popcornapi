@@ -77,6 +77,33 @@ function fetchFromSupabase($endpoint, $queryParams = []) {
     return [];
 }
 
+function fetchFromSupabaseWatch($endpoint, $queryParams = []) {
+    $queryString = http_build_query($queryParams);
+    $url = "https://" . SUPABASE_PROJECT_ID . ".supabase.co/rest/v1/" . $endpoint . ($queryString ? "?" . $queryString : "");
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: " . SUPABASE_TOKEN,
+        "Authorization: Bearer " . SUPABASE_TOKEN,
+        "Content-Type: application/json"
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+
+    
+    curl_close($ch);
+
+    if ($httpCode >= 200 && $httpCode < 300) {
+        return json_decode($response, true) ?: [];
+    }
+    return [];
+}
+
 function safeExtract($string, $start, $end) {
     if (!$string) return "";
     $parts = explode($start, $string);
@@ -294,7 +321,6 @@ if ($want == "series_details") {
 // ================================= MOVIES ================================ //
 // ========================================================================= //
 
-// إندبوينت ذكية لجلب بيانات صف واحد فقط بالـ ID للأفلام أو المسلسلات
 if ($want == "get_by_id") {
     $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
     $table = (isset($_REQUEST['type']) && $_REQUEST['type'] == 'series') ? 'series' : 'movies';
@@ -304,15 +330,24 @@ if ($want == "get_by_id") {
         exit;
     }
 
-    $data = fetchFromSupabase($table, ["id" => "eq." . $id, "limit" => 1]);
+    $data = fetchFromSupabaseWatch($table, ["id" => "eq." . $id, "limit" => 1]);
 
     if (!empty($data) && isset($data[0])) {
-        echo json_encode(["status" => "success", "data" => $data[0]], JSON_UNESCAPED_UNICODE);
+        $row = $data[0];
+
+        if (!empty($row['download_1080'])) {
+            $row['watch'] = str_replace('d/', 'embed-', str_replace('_x', '.html', $row['download_1080']));
+        } else {
+            $row['watch'] = null;
+        }
+
+        echo json_encode(["status" => "success", "data" => $row], JSON_UNESCAPED_UNICODE);
     } else {
         echo json_encode(["status" => "error", "result" => "Item not found"], JSON_UNESCAPED_UNICODE);
     }
     exit;
 }
+
 
 // Home Page
 if ($want == "home") {
