@@ -542,6 +542,7 @@ if ($want == 'search_movies') {
     $result = [];
     foreach ($data as $row) {
         $result[] = [
+            'id' => (int) $row['id'],
             'title' => trim(str_replace(['فيلم', 'مترجم اون لاين - توب سينما'], '', $row['title'])),
             'cover' => $row['cover'] ?? "",
             'story' => $row['story'] ?? "",
@@ -583,6 +584,7 @@ if ($want == 'search_cafe') {
     $result = [];
     foreach ($data as $row) {
         $result[] = [
+            'id' => (int) $row['id'],
             'title' => trim($row['title']),
             'cover' => $row['cover'] ?? "",
             "download" => $row['download_480'] ?? "",
@@ -611,6 +613,7 @@ if ($want == 'filter_movies') {
     $result = [];
     foreach ($data as $row) {
         $result[] = [
+            'id' => (int) $row['id'],
             'title' => trim(str_replace(['فيلم', 'مترجم اون لاين - توب سينما'], '', $row['title'])),
             'cover' => $row['cover'] ?? "",
             'story' => $row['story'] ?? "",
