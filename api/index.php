@@ -611,6 +611,7 @@ if ($want == 'filter_movies') {
     }
 
     $data = fetchFromSupabase("movies", [
+        "select" => "distinct(title)",
         "types" => "ilike.*" . $filter . "*",
         "order" => "id.desc",
         "limit" => $limit
