@@ -86,10 +86,10 @@ class HomeController
         $response = [
             'latest_added' => $latest_added,
             'latest_arabic_series' => Supabase::table('dramacafe')->all([
-                'select' => '*',
-                'order'  => 'id.desc',
-                'category' => 'eq.مسلسلات عربية',
-                'limit'  => 20,
+                'select'   => '*',
+                'order'    => 'id.desc',
+                'category' => 'eq.' . rawurlencode('مسلسلات عربية'),
+                'limit'    => 20,
             ])['data']
         ];
 
