@@ -51,18 +51,41 @@ class HomeController
         // ];
 
 
-        $latest_added = array_merge(Supabase::table('movies')->all([
-            'select' => '*',
-            'order'  => 'id.desc',
-            'limit'  => 2
-        ])['data'],Supabase::table('series')->all([
-            'select' => '*',
-            'order'  => 'id.desc',
-            'limit'  => 2
-        ])['data']);
+        $latest_added = array_merge(
+            Supabase::table('movies')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'limit'  => 4
+            ])['data'],
+            Supabase::table('series')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'limit'  => 4
+            ])['data'],
+            Supabase::table('dramacafe')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'limit'  => 4
+            ])['data'],
+            Supabase::table('turkish_series')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'limit'  => 4
+            ])['data']
+        );
+
+        $latest_arabic_series = array_merge(
+            Supabase::table('dramacafe')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'category' => 'eq.مسلسلات عربية',
+                'limit'  => 20,
+            ])['data'],
+        );
 
         $response = [
-            'latest_added' => $latest_added
+            'latest_added' => $latest_added,
+            'latest_arabic_series' => $latest_arabic_series
         ];
 
         Response::success($response);

@@ -5,7 +5,7 @@ require_once __DIR__ . '/../services/MovieService.php';
 class MoviesController
 {
     private MovieService $service;
-
+    
     public function __construct()
     {
         $this->service = new MovieService();
