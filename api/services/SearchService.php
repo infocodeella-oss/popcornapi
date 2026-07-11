@@ -47,7 +47,7 @@ class SearchService
 
             $response = Supabase::table($config['table'])->all([
                 'select' => '*',
-                $config['field'] => 'ilike.*' . $query . '*',
+                'or' => "series_name.ilike.*{$query}*,story.ilike.*{$query}*",
                 'limit' => Helpers::getLimit()
             ]);
 

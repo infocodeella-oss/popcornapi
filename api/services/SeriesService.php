@@ -29,7 +29,7 @@ class SeriesService
         }
 
         if ($language = Helpers::getQuery('language')) {
-            $params['language'] = 'eq.' . $language;
+            $params['language'] = 'ilike.*' . $language;
         }
 
         return $this->series->all($params);

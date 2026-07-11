@@ -31,7 +31,7 @@ class MovieService
         }
 
         if ($language = Helpers::getQuery('language')) {
-            $params['language'] = 'eq.' . $language;
+            $params['language'] = 'ilike.*' . $language;
         }
 
         if ($quality = Helpers::getQuery('quality')) {
