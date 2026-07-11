@@ -51,9 +51,7 @@ class HomeController
         // ];
 
 
-        $latest_added = [];
-
-        array_merge($latest_added, Supabase::table('movies')->all([
+        $latest_added = array_merge(Supabase::table('movies')->all([
             'select' => '*',
             'order'  => 'id.desc',
             'limit'  => 2
