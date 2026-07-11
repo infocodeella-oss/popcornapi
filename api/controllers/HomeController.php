@@ -52,17 +52,16 @@ class HomeController
 
 
         $latest_added = [];
-        $latest_added[] = Supabase::table('movies')->all([
-            'select' => '*',
-            'order'  => 'id.desc',
-            'limit'  => 2
-        ])['data'];
 
-        $latest_added[] = Supabase::table('series')->all([
+        array_push($latest_added, Supabase::table('movies')->all([
             'select' => '*',
             'order'  => 'id.desc',
             'limit'  => 2
-        ])['data'];
+        ])['data'],Supabase::table('series')->all([
+            'select' => '*',
+            'order'  => 'id.desc',
+            'limit'  => 2
+        ])['data']);
 
         $response = [
             'latest_added' => $latest_added
