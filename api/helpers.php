@@ -85,46 +85,93 @@ class Helpers
     }
 
     public static function parseSeriesTitle(string $title): array
-{
-    $title = trim($title);
+    {
+        $title = trim($title);
 
-    $seasonMap = [
-        'الاول' => 1,
-        'الأول' => 1,
-        'الثاني' => 2,
-        'الثالث' => 3,
-        'الرابع' => 4,
-        'الخامس' => 5,
-        'السادس' => 6,
-        'السابع' => 7,
-        'الثامن' => 8,
-        'التاسع' => 9,
-        'العاشر' => 10
-    ];
+        $seasonMap = [
+            'الاول' => 1,
+            'الأول' => 1,
+            'الثاني' => 2,
+            'الثالث' => 3,
+            'الرابع' => 4,
+            'الخامس' => 5,
+            'السادس' => 6,
+            'السابع' => 7,
+            'الثامن' => 8,
+            'التاسع' => 9,
+            'العاشر' => 10
+        ];
 
-    $series = $title;
-    $season = 1;
-    $episode = 1;
+        $series = $title;
+        $season = 1;
+        $episode = 1;
 
-    if (preg_match('/^مسلسل\s+(.*?)\s+الموسم\s+([^\s]+)\s+الحلقة\s+(\d+)/u', $title, $matches)) {
+        if (preg_match('/^مسلسل\s+(.*?)\s+الموسم\s+([^\s]+)\s+الحلقة\s+(\d+)/u', $title, $matches)) {
 
-        $series = trim($matches[1]);
+            $series = trim($matches[1]);
 
-        $seasonWord = trim($matches[2]);
+            $seasonWord = trim($matches[2]);
 
-        if (isset($seasonMap[$seasonWord])) {
-            $season = $seasonMap[$seasonWord];
-        } elseif (is_numeric($seasonWord)) {
-            $season = (int)$seasonWord;
+            if (isset($seasonMap[$seasonWord])) {
+                $season = $seasonMap[$seasonWord];
+            } elseif (is_numeric($seasonWord)) {
+                $season = (int)$seasonWord;
+            }
+
+            $episode = (int)$matches[3];
         }
 
-        $episode = (int)$matches[3];
+        return [
+            'series' => $series,
+            'season' => $season,
+            'episode' => $episode
+        ];
     }
 
-    return [
-        'series' => $series,
-        'season' => $season,
-        'episode' => $episode
-    ];
-}
+    public static function parseCafeSeriesTitle(string $title): array
+    {
+        $season = 1;
+        $episode = 1;
+        $series = trim($title);
+
+        $seasonMap = [
+            'الاول' => 1,
+            'الأول' => 1,
+            'الثاني' => 2,
+            'الثالث' => 3,
+            'الرابع' => 4,
+            'الخامس' => 5,
+            'السادس' => 6,
+            'السابع' => 7,
+            'الثامن' => 8,
+            'التاسع' => 9,
+            'العاشر' => 10
+        ];
+
+        if (preg_match('/^مسلسل\s+(.*?)\s+الموسم\s+([^\s]+)\s+الحلقة\s+(\d+)/u', $title, $m)) {
+
+            $series = trim($m[1]);
+
+            $word = trim($m[2]);
+
+            $season = $seasonMap[$word] ?? (is_numeric($word) ? (int)$word : 1);
+
+            $episode = (int)$m[3];
+        } elseif (preg_match('/^مسلسل\s+(.*?)\s+الحلقة\s+(\d+)/u', $title, $m)) {
+
+            $series = trim($m[1]);
+
+            $episode = (int)$m[2];
+
+            $season = 1;
+        }
+
+        return [
+
+            'series' => $series,
+            'season' => $season,
+            'episode' => $episode
+
+        ];
+    }
 }

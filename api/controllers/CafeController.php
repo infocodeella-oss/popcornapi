@@ -36,4 +36,15 @@ class CafeController
 
         Response::success($result['data']);
     }
+
+    public function distinct(): void
+    {
+        $result = $this->service->distinct();
+
+        if (!$result['success']) {
+            Response::error('Failed to fetch series', 500);
+        }
+
+        Response::success($result['data']);
+    }
 }

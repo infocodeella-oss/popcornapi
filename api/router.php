@@ -104,15 +104,22 @@ switch ($resource) {
 
     case 'cafe-series':
         require_once __DIR__ . '/controllers/CafeController.php';
+
         $controller = new CafeController();
 
-        if ($id) {
-            $controller->show($id);
-        } else {
+        if (!$id) {
             $controller->index();
+            break;
         }
-        break;
 
+        if ($id === 'distinct') {
+            $controller->distinct();
+            break;
+        }
+
+        $controller->show((int)$id);
+
+        break;
     case 'plays':
         require_once __DIR__ . '/controllers/PlaysController.php';
         $controller = new PlaysController();
