@@ -73,11 +73,23 @@ switch ($resource) {
         require_once __DIR__ . '/controllers/DramaCafeController.php';
         $controller = new DramaCafeController();
 
-        if ($id) {
-            $controller->show($id);
-        } else {
+        if (!$id) {
             $controller->index();
+            break;
         }
+
+        if ($id === 'distinct') {
+            $controller->distinct();
+            break;
+        }
+
+        if (isset($segments[2]) && $segments[2] === 'details') {
+            $controller->details((int)$id);
+            break;
+        }
+
+        $controller->show((int)$id);
+
         break;
 
     case 'turkish-series':
