@@ -1,42 +1,39 @@
 <?php
 
-require_once __DIR__ . '/../models/Supabase.php';
+require_once __DIR__ . '/../services/CafeSeriesService.php';
 
 class CafeController
 {
-    private Supabase $cafe;
+    private CafeSeriesService $service;
 
     public function __construct()
     {
-        $this->cafe = Supabase::table('cafe_series');
+        $this->service = new CafeSeriesService();
     }
 
     public function index(): void
     {
-        $params = [
-            'select' => '*',
-            'order'  => 'id.desc',
-            'limit'  => Helpers::getLimit(),
-            'offset' => Helpers::getOffset()
-        ];
+        $result = $this->service->getAll();
 
-        if ($search = Helpers::getQuery('search')) {
-            $params['title'] = 'ilike.*' . $search . '*';
+        if (!$result['success']) {
+            Response::error('Failed to fetch series', $result['status']);
         }
-
-        $result = $this->cafe->all($params);
 
         Response::success($result['data']);
     }
 
     public function show(int $id): void
     {
-        $result = $this->cafe->find($id);
+        $result = $this->service->find($id);
+
+        if (!$result['success']) {
+            Response::error('Failed to fetch series', $result['status']);
+        }
 
         if (empty($result['data'])) {
             Response::notFound('Series not found');
         }
 
-        Response::success($result['data'][0]);
+        Response::success($result['data']);
     }
 }
