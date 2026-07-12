@@ -24,8 +24,7 @@ class MovieService
         $search = Helpers::getQuery('search');
 
         if (!empty($search)) {
-            echo "Hello";
-            $params['title'] = 'ilike.*' . $search . '*';
+            $params['title'] = 'ilike.*' . rawurlencode($search) . '*';
         }
 
         if ($year = Helpers::getQuery('year')) {
