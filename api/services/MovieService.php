@@ -54,6 +54,10 @@ class MovieService
         if ($rate = Helpers::getQuery('rate')) {
             $params['rate'] = 'ilike.*' . rawurlencode($rate) . '*';
         }
+        
+        if ($section = Helpers::getQuery('section')) {
+            $params['section'] = 'ilike.*' . rawurlencode($section);
+        }
 
         return $this->movies->all($params);
     }
