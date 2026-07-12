@@ -223,9 +223,28 @@ class SeriesService
             return strcmp($a['title'], $b['title']);
         });
 
+        $limit = Helpers::getLimit();
+        $page = max(1, (int)Helpers::getQuery('page', 1));
+
+        $total = count($series);
+
+        $offset = ($page - 1) * $limit;
+
+        $data = array_slice(array_values($series), $offset, $limit);
+
         return [
             'success' => true,
-            'data' => array_values($series)
+            'data' => [
+                'pagination' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'total' => $total,
+                    'total_pages' => ceil($total / $limit),
+                    'has_next' => ($offset + $limit) < $total,
+                    'has_previous' => $page > 1
+                ],
+                'results' => $data
+            ]
         ];
     }
 }
