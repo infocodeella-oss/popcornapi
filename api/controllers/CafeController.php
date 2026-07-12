@@ -47,4 +47,15 @@ class CafeController
 
         Response::success($result['data']);
     }
+
+    public function details(int $id): void
+    {
+        $result = $this->service->details($id);
+
+        if (!$result['success']) {
+            Response::error($result['message'] ?? 'Series not found', 404);
+        }
+
+        Response::success($result['data']);
+    }
 }

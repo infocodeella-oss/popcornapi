@@ -117,9 +117,15 @@ switch ($resource) {
             break;
         }
 
+        if (isset($segments[2]) && $segments[2] === 'details') {
+            $controller->details((int)$id);
+            break;
+        }
+
         $controller->show((int)$id);
 
         break;
+
     case 'plays':
         require_once __DIR__ . '/controllers/PlaysController.php';
         $controller = new PlaysController();
