@@ -59,12 +59,22 @@ class HomeController
             'limit'  => 10
         ])['data']);
 
-        $latest_korean_series = Supabase::table('series')->all([
+        $latest_asian_series = array_merge(Supabase::table('series')->all([
             'select'   => '*',
             'order'    => 'id.desc',
-            'category' => 'eq.' . rawurlencode('الكورية'),
-            'limit'    => 20,
-        ])['data'];
+            'language' => 'eq.' . rawurlencode('الكورية'),
+            'limit'    => 5,
+        ])['data'], Supabase::table('series')->all([
+            'select'   => '*',
+            'order'    => 'id.desc',
+            'language' => 'eq.' . rawurlencode('الصينية'),
+            'limit'    => 5,
+        ])['data'], Supabase::table('series')->all([
+            'select'   => '*',
+            'order'    => 'id.desc',
+            'language' => 'eq.' . rawurlencode('اليابانية'),
+            'limit'    => 5,
+        ])['data']);
 
         $latest_arabic_movies = array_merge(Supabase::table('dramacafe')->all([
             'select'   => '*',
@@ -113,7 +123,7 @@ class HomeController
             'latest_arabic_series' => $latest_arabic_series,
             'latest_english_series' => $latest_english_series,
             'latest_turkish_series' => $latest_turkish_series,
-            'latest_korean_series' => $latest_korean_series,
+            'latest_asian_series' => $latest_asian_series,
             'latest_arabic_movies' => $latest_arabic_movies,
             'latest_english_movies' => $latest_english_movies,
             'latest_french_movies' => $latest_french_movies,
