@@ -129,6 +129,12 @@ class HomeController
             'latest_french_movies' => $latest_french_movies,
             'latest_animation_movies' => $latest_animation_movies,
             'latest_plays' => $latest_plays,
+            'netflix' => Supabase::table('movies')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'section' => 'eq.' . rawurlencode('Netflix'),
+                'limit'  => 20
+            ])['data'],
         ];
 
         Response::success($response);
