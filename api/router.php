@@ -23,6 +23,12 @@ $id = $segments[1] ?? null;
 
 switch ($resource) {
 
+    case 'ramadan2026':
+        require_once __DIR__ . '/controllers/RamadanController.php';
+        $controller = new RamadanController();
+        $controller->index();
+        break;
+
     case 'netflix':
         require_once __DIR__ . '/controllers/NetflixController.php';
         $controller = new NetflixController();

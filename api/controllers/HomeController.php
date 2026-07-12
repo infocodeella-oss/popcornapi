@@ -118,6 +118,13 @@ class HomeController
             'limit'  => 10
         ])['data'];
 
+        $ramadan_series_2026 = Supabase::table('cafe_series')->all([
+                'select'  => 'distinct(title), *',
+                'order'  => 'id.desc',
+                'section' => 'eq.' . rawurlencode('رمضان 2026'),
+                'limit'  => 20
+            ])['data'];
+
         $response = [
             'latest_added' => $latest_added,
             'latest_arabic_series' => $latest_arabic_series,
@@ -129,6 +136,7 @@ class HomeController
             'latest_french_movies' => $latest_french_movies,
             'latest_animation_movies' => $latest_animation_movies,
             'latest_plays' => $latest_plays,
+            'ramadan_series_2026' => $ramadan_series_2026,
         ];
 
         Response::success($response);
