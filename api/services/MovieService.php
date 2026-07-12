@@ -32,15 +32,15 @@ class MovieService
         }
 
         if ($language = Helpers::getQuery('language')) {
-            $params['language'] = 'ilike.*' . $language;
+            $params['language'] = 'ilike.*' . rawurlencode($language);
         }
 
         if ($quality = Helpers::getQuery('quality')) {
-            $params['quality'] = 'eq.' . $quality;
+            $params['quality'] = 'eq.' . rawurlencode($quality);
         }
 
         if ($category = Helpers::getQuery('category')) {
-            $params['category'] = 'ilike.*' . $category . '*';
+            $params['category'] = 'ilike.*' . rawurlencode($category) . '*';
         }
 
         return $this->movies->all($params);
