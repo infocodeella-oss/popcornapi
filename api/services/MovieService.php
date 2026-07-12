@@ -43,6 +43,18 @@ class MovieService
             $params['category'] = 'ilike.*' . rawurlencode($category) . '*';
         }
 
+        if ($types = Helpers::getQuery('types')) {
+            $params['types'] = 'ilike.*' . rawurlencode($types) . '*';
+        }
+
+        if ($actors = Helpers::getQuery('actors')) {
+            $params['actors'] = 'ilike.*' . rawurlencode($actors) . '*';
+        }
+
+        if ($rate = Helpers::getQuery('rate')) {
+            $params['rate'] = 'ilike.*' . rawurlencode($rate) . '*';
+        }
+
         return $this->movies->all($params);
     }
 
