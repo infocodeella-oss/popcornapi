@@ -11,7 +11,7 @@ class NetflixController
             Supabase::table('movies')->all([
                 'select' => '*',
                 'order'  => 'id.desc',
-                'section' => 'eq.' . rawurlencode('Netflix'),
+                'section' => 'eq.Netflix',
                 'limit'  => 20
             ])['data']
         ];
