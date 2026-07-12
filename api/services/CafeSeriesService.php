@@ -29,6 +29,10 @@ class CafeSeriesService
             $params['section'] = 'ilike.*' . rawurlencode($section);
         }
 
+        if ($category = Helpers::getQuery('category')) {
+            $params['category'] = 'ilike.*' . rawurlencode($category);
+        }
+
         return $this->series->all($params);
     }
 
