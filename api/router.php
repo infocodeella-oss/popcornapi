@@ -23,6 +23,12 @@ $id = $segments[1] ?? null;
 
 switch ($resource) {
 
+    case 'netflix':
+        require_once __DIR__ . '/controllers/NetflixController.php';
+        $controller = new NetflixController();
+        $controller->index();
+        break;
+
     case 'home':
         require_once __DIR__ . '/controllers/HomeController.php';
         $controller = new HomeController();
