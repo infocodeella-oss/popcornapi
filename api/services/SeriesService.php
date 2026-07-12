@@ -21,15 +21,35 @@ class SeriesService
         ];
 
         if ($search = Helpers::getQuery('search')) {
-            $params['title'] = 'ilike.*' . $search . '*';
+            $params['title'] = 'ilike.*' . rawurlencode($search) . '*';
         }
 
         if ($year = Helpers::getQuery('year')) {
-            $params['year'] = 'eq.' . $year;
+            $params['year'] = 'eq.' . rawurlencode($year);
         }
 
         if ($language = Helpers::getQuery('language')) {
-            $params['language'] = 'ilike.*' . $language;
+            $params['language'] = 'ilike.*' . rawurlencode($language);
+        }
+
+        if ($country = Helpers::getQuery('country')) {
+            $params['country'] = 'ilike.*' . rawurlencode($country);
+        }
+
+        if ($rate = Helpers::getQuery('rate')) {
+            $params['rate'] = 'ilike.*' . rawurlencode($rate);
+        }
+
+        if ($types = Helpers::getQuery('types')) {
+            $params['types'] = 'ilike.*' . rawurlencode($types);
+        }
+
+        if ($actors = Helpers::getQuery('actors')) {
+            $params['actors'] = 'ilike.*' . rawurlencode($actors);
+        }
+
+        if ($section = Helpers::getQuery('section')) {
+            $params['section'] = 'ilike.*' . rawurlencode($section);
         }
 
         return $this->series->all($params);

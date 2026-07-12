@@ -91,6 +91,7 @@ class HomeController
         $latest_english_movies = array_merge(Supabase::table('movies')->all([
             'select'   => '*',
             'order'    => 'id.desc',
+            'cover'   => 'neq.',
             'limit'    => 10,
         ])['data'], Supabase::table('dramacafe')->all([
             'select'   => '*',
