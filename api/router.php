@@ -55,6 +55,11 @@ switch ($resource) {
             break;
         }
 
+        if ($id === 'distinct') {
+            $controller->distinct();
+            break;
+        }
+
         if (isset($segments[2]) && $segments[2] === 'details') {
             $controller->details((int)$id);
             break;
