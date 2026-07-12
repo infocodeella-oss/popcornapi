@@ -25,11 +25,11 @@ class DramaCafeController
         }
 
         if ($type = Helpers::getQuery('type')) {
-            $params['type'] = 'eq.' . $type;
+            $params['type'] = 'eq.' . rawurlencode($type);
         }
 
         if ($category = Helpers::getQuery('category')) {
-            $params['category'] = 'ilike.*' . $category . '*';
+            $params['category'] = 'ilike.*' . rawurlencode($category) . '*';
         }
 
         $result = $this->dramacafe->all($params);
