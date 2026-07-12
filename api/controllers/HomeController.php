@@ -118,11 +118,10 @@ class HomeController
             'limit'  => 10
         ])['data'];
 
-        $ramadan_series_2026 = Supabase::table('cafe_series')->all([
-                'select'  => 'distinct(title), *',
-                'order'  => 'id.desc',
+        $ramadan_series_2026 = Supabase::table('v_ramadan_first_episodes')->all([
+                'select'  => '*',
                 'section' => 'eq.' . rawurlencode('رمضان 2026'),
-                'limit'  => 20
+                'limit'   => 20
             ])['data'];
 
         $response = [
