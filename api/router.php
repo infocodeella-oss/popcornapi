@@ -94,10 +94,8 @@ switch ($resource) {
         require_once __DIR__ . '/controllers/CafeController.php';
         $controller = new CafeController();
 
-        if (is_integer($id)) {
+        if ($id) {
             $controller->show($id);
-        } elseif (!is_integer($segments[1])) {
-            $controller->indexRamadan();
         } else {
             $controller->index();
         }

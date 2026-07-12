@@ -21,17 +21,6 @@ class CafeController
 
         Response::success($result['data']);
     }
-    
-    public function indexRamadan(): void
-    {
-        $result = $this->service->ramadan();
-
-        if (!$result['success']) {
-            Response::error('Failed to fetch series', $result['status']);
-        }
-
-        Response::success($result['data']);
-    }
 
     public function show(int $id): void
     {

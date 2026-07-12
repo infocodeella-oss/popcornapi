@@ -47,7 +47,7 @@ class SearchService
 
             $response = Supabase::table($config['table'])->all([
                 'select' => '*',
-                $config['field'] => 'ilike.*' . $query . '*',
+                $config['field'] => 'ilike.*' . rawurlencode($query) . '*',
                 'limit' => Helpers::getLimit()
             ]);
 

@@ -31,7 +31,7 @@ class ActorService
 
             $response = Supabase::table($config['table'])->all([
                 'select' => '*',
-                'actors' => 'ilike.*' . $actor . '*'
+                'actors' => 'ilike.*' . rawurlencode($actor) . '*'
             ]);
 
             if (!$response['success']) {
