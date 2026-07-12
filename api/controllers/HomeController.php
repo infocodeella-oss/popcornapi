@@ -11,6 +11,7 @@ class HomeController
             Supabase::table('movies')->all([
                 'select' => '*',
                 'order'  => 'id.desc',
+                'cover'   => 'neq.',
                 'limit'  => 4
             ])['data'],
             Supabase::table('series')->all([
@@ -121,7 +122,7 @@ class HomeController
         $ramadan_series_2026 = Supabase::table('v_ramadan_first_episodes')->all([
                 'select'  => '*',
                 'section' => 'eq.' . rawurlencode('رمضان 2026'),
-                'limit'   => 20
+                'limit'   => 10
             ])['data'];
 
         $response = [
