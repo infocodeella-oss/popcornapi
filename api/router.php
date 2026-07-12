@@ -96,6 +96,8 @@ switch ($resource) {
 
         if ($id) {
             $controller->show($id);
+        } elseif (!is_integer($segments[1])) {
+            $controller->indexRamadan();
         } else {
             $controller->index();
         }
