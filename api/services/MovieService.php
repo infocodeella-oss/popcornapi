@@ -16,6 +16,7 @@ class MovieService
         $params = [
             'select' => '*',
             'order'  => 'id.desc',
+            'cover'   => 'neq.',
             'limit'  => Helpers::getLimit(),
             'offset' => Helpers::getOffset()
         ];
