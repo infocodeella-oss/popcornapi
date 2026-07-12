@@ -83,4 +83,48 @@ class Helpers
 
         return $result;
     }
+
+    public static function parseSeriesTitle(string $title): array
+{
+    $title = trim($title);
+
+    $seasonMap = [
+        'الاول' => 1,
+        'الأول' => 1,
+        'الثاني' => 2,
+        'الثالث' => 3,
+        'الرابع' => 4,
+        'الخامس' => 5,
+        'السادس' => 6,
+        'السابع' => 7,
+        'الثامن' => 8,
+        'التاسع' => 9,
+        'العاشر' => 10
+    ];
+
+    $series = $title;
+    $season = 1;
+    $episode = 1;
+
+    if (preg_match('/^مسلسل\s+(.*?)\s+الموسم\s+([^\s]+)\s+الحلقة\s+(\d+)/u', $title, $matches)) {
+
+        $series = trim($matches[1]);
+
+        $seasonWord = trim($matches[2]);
+
+        if (isset($seasonMap[$seasonWord])) {
+            $season = $seasonMap[$seasonWord];
+        } elseif (is_numeric($seasonWord)) {
+            $season = (int)$seasonWord;
+        }
+
+        $episode = (int)$matches[3];
+    }
+
+    return [
+        'series' => $series,
+        'season' => $season,
+        'episode' => $episode
+    ];
+}
 }

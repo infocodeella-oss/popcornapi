@@ -68,4 +68,88 @@ class SeriesService
             'order'  => 'id.asc'
         ]);
     }
+
+    public function details(int $id): array
+{
+    $current = $this->find($id);
+
+    if (!$current['success'] || empty($current['data'])) {
+        return [
+            'success' => false,
+            'message' => 'Series not found'
+        ];
+    }
+
+    $currentEpisode = $current['data'][0];
+
+    $parsed = Helpers::parseSeriesTitle($currentEpisode['title']);
+
+    $episodes = $this->series->where([
+        'select' => '*',
+        'title' => 'ilike.*' . rawurlencode($parsed['series']) . '*',
+        'order' => 'id.asc'
+    ]);
+
+    if (!$episodes['success']) {
+        return [
+            'success' => false,
+            'message' => 'Episodes not found'
+        ];
+    }
+
+    $seasons = [];
+
+    foreach ($episodes['data'] as $episode) {
+
+        $info = Helpers::parseSeriesTitle($episode['title']);
+
+        $season = $info['season'];
+
+        if (!isset($seasons[$season])) {
+
+            $seasons[$season] = [
+                'season' => $season,
+                'episodes' => []
+            ];
+
+        }
+
+        $episode['season'] = $info['season'];
+        $episode['episode'] = $info['episode'];
+        $episode['current'] = ($episode['id'] == $id);
+
+        $seasons[$season]['episodes'][] = $episode;
+    }
+
+    ksort($seasons);
+
+    foreach ($seasons as &$season) {
+
+        usort($season['episodes'], function ($a, $b) {
+
+            return $a['episode'] <=> $b['episode'];
+
+        });
+
+    }
+
+    return [
+        'success' => true,
+        'data' => [
+            'series' => [
+                'title' => $parsed['series'],
+                'cover' => $currentEpisode['cover'],
+                'story' => $currentEpisode['story'],
+                'year' => $currentEpisode['year']
+            ],
+            'current_episode' => [
+                'id' => $currentEpisode['id'],
+                'season' => $parsed['season'],
+                'episode' => $parsed['episode']
+            ],
+            'total_seasons' => count($seasons),
+            'seasons' => array_values($seasons)
+        ]
+    ];
+}
 }
