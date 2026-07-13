@@ -12,6 +12,7 @@ class CafeController
     public function __construct()
     {
         $this->cafe = new CafeSeriesService();
+        $this->service = Supabase::table('cafe-series');
     }
 
         public function index(): void
