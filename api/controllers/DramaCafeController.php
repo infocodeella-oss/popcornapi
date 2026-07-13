@@ -32,6 +32,10 @@ class DramaCafeController
             $params['category'] = 'ilike.*' . rawurlencode($category) . '*';
         }
 
+        if ($dubbed = Helpers::getQuery('dubbed')) {
+            $params['dubbed'] = 'ilike.*' . rawurlencode($dubbed) . '*';
+        }
+
         $result = $this->dramacafe->all($params);
 
         Response::success($result['data']);
