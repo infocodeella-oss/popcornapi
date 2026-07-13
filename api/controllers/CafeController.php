@@ -22,7 +22,6 @@ class CafeController
             'order'  => 'id.desc',
             'limit'  => Helpers::getLimit(),
             'offset' => Helpers::getOffset(),
-            'title'  => 'imatch.^[ \x{0600}-\x{06FF}]+$' 
         ];
 
         if ($search = Helpers::getQuery('search')) {
