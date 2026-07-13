@@ -23,8 +23,6 @@ class CafeController
             'order'  => 'id.desc',
             'limit'  => Helpers::getLimit(),
             'offset' => Helpers::getOffset(),
-            // 2. Use a Posix Regex filter to match Arabic characters only
-            'title'  => 'imatch.^[ \x{0600}-\x{06FF}]+$' 
         ];
 
         if ($search = Helpers::getQuery('search')) {
