@@ -1,30 +1,54 @@
 <?php
 
 require_once __DIR__ . '/../services/CafeSeriesService.php';
+require_once __DIR__ . '/../models/Supabase.php';
 
 class CafeController
 {
-    private CafeSeriesService $service;
+    private CafeSeriesService $cafe;
+    private Supabase $service;
+
 
     public function __construct()
     {
-        $this->service = new CafeSeriesService();
+        $this->cafe = new CafeSeriesService();
     }
 
     public function index(): void
     {
-        $result = $this->service->getAll();
 
-        if (!$result['success']) {
-            Response::error('Failed to fetch series', $result['status']);
+        $params = [
+            'select' => '*',
+            'order'  => 'id.desc',
+            'limit'  => Helpers::getLimit(),
+            'offset' => Helpers::getOffset()
+        ];
+
+        if ($search = Helpers::getQuery('search')) {
+            $params['title'] = 'ilike.*' . $search . '*';
         }
 
+        if ($type = Helpers::getQuery('type')) {
+            $params['type'] = 'eq.' . rawurlencode($type);
+        }
+
+        if ($category = Helpers::getQuery('category')) {
+            $params['category'] = 'ilike.*' . rawurlencode($category) . '*';
+        }
+
+        if ($dubbed = Helpers::getQuery('dubbed')) {
+            $params['dubbed'] = 'eq.' . rawurlencode($dubbed);
+        }
+
+        $result = $this->service->all($params);
+
         Response::success($result['data']);
+
     }
 
     public function show(int $id): void
     {
-        $result = $this->service->find($id);
+        $result = $this->cafe->find($id);
 
         if (!$result['success']) {
             Response::error('Failed to fetch series', $result['status']);
@@ -39,7 +63,7 @@ class CafeController
 
     public function distinct(): void
     {
-        $result = $this->service->distinct();
+        $result = $this->cafe->distinct();
 
         if (!$result['success']) {
             Response::error('Failed to fetch series', 500);
@@ -50,7 +74,7 @@ class CafeController
 
     public function details(int $id): void
     {
-        $result = $this->service->details($id);
+        $result = $this->cafe->details($id);
 
         if (!$result['success']) {
             Response::error($result['message'] ?? 'Series not found', 404);
