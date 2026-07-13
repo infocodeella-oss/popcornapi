@@ -12,17 +12,17 @@ class CafeController
     public function __construct()
     {
         $this->cafe = new CafeSeriesService();
-        $this->service = Supabase::table('cafe-series');
+        $this->service = Supabase::table('cafe_series');
     }
 
         public function index(): void
     {
         $params = [
-            // 1. Change '*' to 'title' to return only the title column
             'select' => 'title', 
             'order'  => 'id.desc',
             'limit'  => Helpers::getLimit(),
             'offset' => Helpers::getOffset(),
+            'title'  => 'imatch.^[ \x{0600}-\x{06FF}]+$' 
         ];
 
         if ($search = Helpers::getQuery('search')) {
