@@ -1,42 +1,30 @@
 <?php
 
 require_once __DIR__ . '/../services/CafeSeriesService.php';
-require_once __DIR__ . '/../models/Supabase.php';
 
 class CafeController
 {
-    private CafeSeriesService $cafe;
-    private Supabase $service;
-
+    private CafeSeriesService $service;
 
     public function __construct()
     {
-        $this->cafe = new CafeSeriesService();
-        $this->service = Supabase::table('cafe_series');
+        $this->service = new CafeSeriesService();
     }
 
-        public function index(): void
+    public function index(): void
     {
-        $params = [
-            'select' => 'title', 
-            'order'  => 'id.desc',
-            'limit'  => Helpers::getLimit(),
-            'offset' => Helpers::getOffset(),
-        ];
+        $result = $this->service->getAll();
 
-        if ($search = Helpers::getQuery('search')) {
-            $params['title'] = 'ilike.*' . $search . '*';
+        if (!$result['success']) {
+            Response::error('Failed to fetch series', $result['status']);
         }
-
-        $result = $this->service->all($params);
 
         Response::success($result['data']);
     }
 
-
     public function show(int $id): void
     {
-        $result = $this->cafe->find($id);
+        $result = $this->service->find($id);
 
         if (!$result['success']) {
             Response::error('Failed to fetch series', $result['status']);
@@ -51,7 +39,7 @@ class CafeController
 
     public function distinct(): void
     {
-        $result = $this->cafe->distinct();
+        $result = $this->service->distinct();
 
         if (!$result['success']) {
             Response::error('Failed to fetch series', 500);
@@ -62,7 +50,7 @@ class CafeController
 
     public function details(int $id): void
     {
-        $result = $this->cafe->details($id);
+        $result = $this->service->details($id);
 
         if (!$result['success']) {
             Response::error($result['message'] ?? 'Series not found', 404);
