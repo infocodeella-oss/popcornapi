@@ -14,37 +14,27 @@ class CafeController
         $this->cafe = new CafeSeriesService();
     }
 
-    public function index(): void
+        public function index(): void
     {
-
         $params = [
-            'select' => '*',
+            // 1. Change '*' to 'title' to return only the title column
+            'select' => 'title', 
             'order'  => 'id.desc',
             'limit'  => Helpers::getLimit(),
-            'offset' => Helpers::getOffset()
+            'offset' => Helpers::getOffset(),
+            // 2. Use a Posix Regex filter to match Arabic characters only
+            'title'  => 'imatch.^[ \x{0600}-\x{06FF}]+$' 
         ];
 
         if ($search = Helpers::getQuery('search')) {
             $params['title'] = 'ilike.*' . $search . '*';
         }
 
-        if ($type = Helpers::getQuery('type')) {
-            $params['type'] = 'eq.' . rawurlencode($type);
-        }
-
-        if ($category = Helpers::getQuery('category')) {
-            $params['category'] = 'ilike.*' . rawurlencode($category) . '*';
-        }
-
-        if ($dubbed = Helpers::getQuery('dubbed')) {
-            $params['dubbed'] = 'eq.' . rawurlencode($dubbed);
-        }
-
         $result = $this->service->all($params);
 
         Response::success($result['data']);
-
     }
+
 
     public function show(int $id): void
     {
