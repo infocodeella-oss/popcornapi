@@ -55,16 +55,14 @@ class SeriesService
         return $this->series->all($params);
     }
 
-    public function find(int $id): array
+    public function find(int $id)
     {
 
         $data = $this->series->find($id);
 
-        if ($data['details_ref']) {
-            echo "Emad Othman";
-        } 
+        print_r($data);
 
-        return $data;
+        // return $data;
     }
 
     public function getEpisodes(string $title): array
