@@ -34,12 +34,6 @@ class SeriesController
             Response::notFound('Series not found');
         }
 
-        if (!empty($result['details_ref'])) {
-            $result['data']['details'] = $this->service->find($result['details_ref'])['details'];
-        }
-
-        echo "Emad";
-
         Response::success($result['data']);
     }
 
