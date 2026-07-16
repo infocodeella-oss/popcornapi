@@ -7,6 +7,24 @@ class HomeController
     public function index(): void
     {
 
+        $hero = array_merge(Supabase::table('movies')->all([
+            'select' => '*',
+            'order'  => 'id.desc',
+            'limit'  => 3,
+            'details'   => 'neq.',
+        ])['data'], Supabase::table('series')->all([
+            'select'   => '*',
+            'order'    => 'id.desc',
+            'details' => 'neq.',
+            'limit'    => 3,
+        ])['data'], Supabase::table('dramacafe')->all([
+            'select'   => '*',
+            'order'    => 'id.desc',
+            'category' => 'eq.' . rawurlencode('افلام عربي'),
+            'details' => 'neq.',
+            'limit'    => 3,
+        ])['data']);
+
         $latest_added = array_merge(
             Supabase::table('movies')->all([
                 'select' => '*',
@@ -127,6 +145,7 @@ class HomeController
             ])['data'];
 
         $response = [
+            'hero' => $hero,
             'latest_added' => $latest_added,
             'latest_arabic_series' => $latest_arabic_series,
             'latest_english_series' => $latest_english_series,
