@@ -38,6 +38,8 @@ class SeriesController
             $result['data']['details'] = $this->service->find($result['details_ref'])['details'];
         }
 
+        echo "Emad";
+
         Response::success($result['data']);
     }
 
