@@ -60,7 +60,9 @@ class SeriesService
 
         $data = $this->series->find($id);
 
-        print_r($data['data'][0]['details_ref']);
+        if (!empty($data['data'][0]['details_ref'])) {
+            print_r($this->series->find($data['data'][0]['details_ref']));
+        }
 
         // return $data;
     }
