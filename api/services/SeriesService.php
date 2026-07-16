@@ -60,9 +60,9 @@ class SeriesService
 
         $data = $this->series->find($id);
 
-        if (!empty($data['details_ref'])) {
+        if ($data['details_ref']) {
             echo "Emad Othman";
-        }
+        } 
 
         return $data;
     }
