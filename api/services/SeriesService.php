@@ -57,7 +57,12 @@ class SeriesService
 
     public function find(int $id): array
     {
-        return $this->series->find($id);
+
+        $data = $this->series->find($id);
+
+        echo "EL3OMDA";
+
+        return $data;
     }
 
     public function getEpisodes(string $title): array
