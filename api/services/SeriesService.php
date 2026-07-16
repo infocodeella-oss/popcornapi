@@ -61,10 +61,10 @@ class SeriesService
         $data = $this->series->find($id);
 
         if (!empty($data['data'][0]['details_ref'])) {
-            print_r($this->series->find($data['data'][0]['details_ref']));
+            $data['data'][0]['details'] = $this->series->find($data['data'][0]['details_ref'])['data'][0]['details'];
         }
 
-        // return $data;
+        return $data;
     }
 
     public function getEpisodes(string $title): array
