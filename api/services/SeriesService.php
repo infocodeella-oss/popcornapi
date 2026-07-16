@@ -60,7 +60,7 @@ class SeriesService
 
         $data = $this->series->find($id);
 
-        print_r($data);
+        print_r($data['data'][0]['details_ref']);
 
         // return $data;
     }
