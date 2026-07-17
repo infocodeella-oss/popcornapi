@@ -5,10 +5,10 @@ class Database
     private string $baseUrl;
     private string $apiKey;
 
-    public function __construct()
+    public function __construct(string $baseUrl, string $apiKey)
     {
-        $this->baseUrl = rtrim(SUPABASE_URL, '/');
-        $this->apiKey = SUPABASE_KEY;
+        $this->baseUrl = rtrim($baseUrl, '/');
+        $this->apiKey = $apiKey;
     }
 
     public function get(string $table, array $params = []): array
