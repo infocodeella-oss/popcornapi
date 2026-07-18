@@ -8,18 +8,6 @@ define('APP_VERSION', '1.0.0');
 define('SUPABASE_DATABASES', [
 
     [
-        "name" => "Main",
-
-        "url" => "https://rlnowsoqwuqudybgyexz.supabase.co/rest/v1/",
-
-        "key" => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc",
-
-        "tables" => [
-            "movies",
-            "series",
-        ]
-    ],
-    [
         "name" => "New",
 
         "url" => "https://uhdydbabctxrklbxptyk.supabase.co/rest/v1/",
@@ -32,6 +20,19 @@ define('SUPABASE_DATABASES', [
             "dramacafe",
         ]
     ],
+    [
+        "name" => "Main",
+
+        "url" => "https://rlnowsoqwuqudybgyexz.supabase.co/rest/v1/",
+
+        "key" => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJsbm93c29xd3VxdWR5Ymd5ZXh6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTcwMTMyMywiZXhwIjoyMDk3Mjc3MzIzfQ.mmxqDZCcilhEMdvnih7COPhd3-J9IP05BSJiAYvw0Qc",
+
+        "tables" => [
+            "movies",
+            "series",
+        ]
+    ],
+
 
 ]);
 
