@@ -18,9 +18,7 @@ class DatabaseManager
             if (in_array($table, $database['tables'])) {
 
                 $this->databases[] = $database;
-
             }
-
         }
 
 
@@ -29,9 +27,7 @@ class DatabaseManager
             throw new Exception(
                 "Table '{$table}' is not configured."
             );
-
         }
-
     }
 
 
@@ -57,7 +53,6 @@ class DatabaseManager
             if (!$response['success']) {
 
                 continue;
-
             }
 
 
@@ -75,11 +70,7 @@ class DatabaseManager
 
 
                 $results[] = $row;
-
-
             }
-
-
         }
 
 
@@ -92,10 +83,112 @@ class DatabaseManager
             'data' => $results
 
         ];
-
     }
 
+    public function find(string $table, int $id): array
+    {
 
+        $results = [];
+
+
+        foreach ($this->databases as $databaseConfig) {
+
+
+            $database = new Database($databaseConfig);
+
+
+            $response = $database->get(
+                $table,
+                [
+                    'id' => 'eq.' . $id,
+                    'limit' => 1
+                ]
+            );
+
+
+            if (!$response['success']) {
+                continue;
+            }
+
+
+            foreach ($response['data'] as $row) {
+
+
+                $row['_project'] = $databaseConfig['name'];
+
+
+                $row['_uid'] =
+                    $databaseConfig['name']
+                    . '_'
+                    . ($row['id'] ?? uniqid());
+
+
+                $results[] = $row;
+            }
+        }
+
+
+        return [
+
+            'success' => true,
+
+            'status' => 200,
+
+            'data' => $results
+
+        ];
+    }
+
+    public function where(string $table, array $params = []): array
+    {
+
+        $results = [];
+
+
+        foreach ($this->databases as $databaseConfig) {
+
+
+            $database = new Database($databaseConfig);
+
+
+            $response = $database->get(
+                $table,
+                $params
+            );
+
+
+            if (!$response['success']) {
+                continue;
+            }
+
+
+            foreach ($response['data'] as $row) {
+
+
+                $row['_project'] = $databaseConfig['name'];
+
+
+                $row['_uid'] =
+                    $databaseConfig['name']
+                    . '_'
+                    . ($row['id'] ?? uniqid());
+
+
+                $results[] = $row;
+            }
+        }
+
+
+        return [
+
+            'success' => true,
+
+            'status' => 200,
+
+            'data' => $results
+
+        ];
+    }
 
     public function post(string $table, array $data): array
     {
@@ -109,7 +202,6 @@ class DatabaseManager
             'message' => 'Not implemented'
 
         ];
-
     }
 
 
@@ -118,8 +210,7 @@ class DatabaseManager
         string $table,
         array $params,
         array $data
-    ): array
-    {
+    ): array {
 
         return [
 
@@ -130,7 +221,6 @@ class DatabaseManager
             'message' => 'Not implemented'
 
         ];
-
     }
 
 
@@ -138,8 +228,7 @@ class DatabaseManager
     public function delete(
         string $table,
         array $params
-    ): array
-    {
+    ): array {
 
         return [
 
@@ -150,8 +239,5 @@ class DatabaseManager
             'message' => 'Not implemented'
 
         ];
-
     }
-
-
 }

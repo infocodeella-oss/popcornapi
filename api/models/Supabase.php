@@ -25,15 +25,18 @@ class Supabase
 
     public function find(int $id): array
     {
-        return $this->db->get($this->table, [
-            'id' => 'eq.' . $id,
-            'limit' => 1
-        ]);
+        return $this->db->find(
+            $this->table,
+            $id
+        );
     }
 
     public function where(array $params): array
     {
-        return $this->db->get($this->table, $params);
+        return $this->db->where(
+            $this->table,
+            $params
+        );
     }
 
     public function create(array $data): array
