@@ -4,7 +4,7 @@ require_once __DIR__ . '/../database_manager.php';
 
 class Supabase
 {
-    private Database $db;
+    private DatabaseManager $db;
     private string $table;
 
     public function __construct(string $table)
