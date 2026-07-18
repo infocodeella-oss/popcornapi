@@ -53,7 +53,7 @@ class Database
 
             foreach ($params as $key => $value) {
 
-                $query[] = $key . '=' . urlencode($value);
+                $query[] = $key . '=' . $value;
 
             }
 
