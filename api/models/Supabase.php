@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../database.php';
+require_once __DIR__ . '/../database_manager.php';
 
 class Supabase
 {
@@ -9,7 +9,7 @@ class Supabase
 
     public function __construct(string $table)
     {
-        $this->db = new Database($table);
+        $this->db = new DatabaseManager($table);
         $this->table = $table;
     }
 
