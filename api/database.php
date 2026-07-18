@@ -38,9 +38,9 @@ class Database
 
             foreach ($response['data'] as $row) {
 
-                $row['_project'] = $database['id'];
-                $row['_uid'] = $database['id'] . '_' . ($row['id'] ?? uniqid());
-
+                $row['_project'] = $database['name'];
+                $row['_uid'] = $database['name'] . '_' . ($row['id'] ?? uniqid());    
+            
                 $results[] = $row;
 
             }
