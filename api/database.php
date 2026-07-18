@@ -2,53 +2,107 @@
 
 class Database
 {
-    private string $baseUrl;
-    private string $apiKey;
+    private array $databases = [];
 
-    public function __construct(string $baseUrl, string $apiKey)
+    public function __construct(string $table)
     {
-        $this->baseUrl = rtrim($baseUrl, '/');
-        $this->apiKey = $apiKey;
+        foreach (SUPABASE_DATABASES as $database) {
+
+            if (in_array($table, $database['tables'])) {
+                $this->databases[] = $database;
+            }
+
+        }
+
+        if (empty($this->databases)) {
+            throw new Exception("Table '{$table}' is not configured.");
+        }
     }
 
     public function get(string $table, array $params = []): array
     {
-        return $this->request('GET', $table, $params);
+        $results = [];
+
+        foreach ($this->databases as $database) {
+
+            $response = $this->request(
+                $database,
+                'GET',
+                $table,
+                $params
+            );
+
+            if (!$response['success']) {
+                continue;
+            }
+
+            foreach ($response['data'] as $row) {
+
+                $row['_project'] = $database['id'];
+                $row['_uid'] = $database['id'] . '_' . ($row['id'] ?? uniqid());
+
+                $results[] = $row;
+
+            }
+
+        }
+
+        return [
+
+            'success' => true,
+            'status' => 200,
+            'data' => $results
+
+        ];
     }
 
     public function post(string $table, array $data): array
     {
-        return $this->request('POST', $table, [], $data);
+        return [
+            'success' => false,
+            'status' => 501,
+            'message' => 'Not implemented'
+        ];
     }
 
     public function patch(string $table, array $params, array $data): array
     {
-        return $this->request('PATCH', $table, $params, $data);
+        return [
+            'success' => false,
+            'status' => 501,
+            'message' => 'Not implemented'
+        ];
     }
 
     public function delete(string $table, array $params): array
     {
-        return $this->request('DELETE', $table, $params);
+        return [
+            'success' => false,
+            'status' => 501,
+            'message' => 'Not implemented'
+        ];
     }
 
     private function request(
+        array $database,
         string $method,
         string $table,
         array $params = [],
         array $body = []
     ): array {
 
-        $url = $this->baseUrl . '/' . $table;
+        $url = rtrim($database['url'], '/') . '/' . $table;
 
         if (!empty($params)) {
 
             $query = [];
 
             foreach ($params as $key => $value) {
-                $query[] = $key . '=' . $value;
+                $query[] = $key . '=' . urlencode($value);
             }
 
             $url .= '?' . implode('&', $query);
+
         }
 
         $ch = curl_init($url);
@@ -60,8 +114,8 @@ class Database
 
             CURLOPT_HTTPHEADER => [
 
-                'apikey: ' . $this->apiKey,
-                'Authorization: Bearer ' . $this->apiKey,
+                'apikey: ' . $database['key'],
+                'Authorization: Bearer ' . $database['key'],
                 'Content-Type: application/json',
                 'Prefer: return=representation'
 
@@ -70,13 +124,11 @@ class Database
         ]);
 
         if (!empty($body)) {
-
             curl_setopt(
                 $ch,
                 CURLOPT_POSTFIELDS,
                 json_encode($body, JSON_UNESCAPED_UNICODE)
             );
-
         }
 
         $response = curl_exec($ch);
@@ -90,12 +142,9 @@ class Database
         if ($error) {
 
             return [
-
                 'success' => false,
                 'status' => 500,
-                'message' => $error,
                 'data' => []
-
             ];
 
         }
