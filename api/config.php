@@ -32,6 +32,7 @@ define('SUPABASE_DATABASES', [
             "movies",
             "series",
             "turkish_series",
+            "v_ramadan_first_episodes",
             "plays",
             "arabic-movies"
         ]
