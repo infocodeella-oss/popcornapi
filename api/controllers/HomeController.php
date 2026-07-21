@@ -7,30 +7,25 @@ class HomeController
     public function index(): void
     {
 
-        $hero = array_merge(Supabase::table('movies')->all([
+        $hero = array_merge(
+            Supabase::table('movies')->all([
                 'select' => '*',
                 'order'  => 'id.desc',
                 'cover'   => 'neq.',
-                'limit'  => 4
-            ])['data']);
-
-        // $hero = array_merge(Supabase::table('movies')->all([
-        //     'select' => '*',
-        //     'order'  => 'id.desc',
-        //     'limit'  => 2,
-        //     'details'   => 'neq.',
-        // ])['data'], Supabase::table('series')->all([
-        //     'select'   => '*',
-        //     'order'    => 'id.desc',
-        //     'details' => 'neq.',
-        //     'limit'    => 1,
-        // ])['data'], Supabase::table('dramacafe')->all([
-        //     'select'   => '*',
-        //     'order'    => 'id.desc',
-        //     'category' => 'eq.' . rawurlencode('افلام عربي'),
-        //     'details' => 'neq.',
-        //     'limit'    => 2,
-        // ])['data']);
+                'limit'  => 2
+            ])['data'],
+            Supabase::table('series')->all([
+                'select' => '*',
+                'order'  => 'id.desc',
+                'limit'  => 1
+            ])['data'],
+            Supabase::table('dramacafe')->all([
+                'select' => '*',
+                'category' => 'eq.' . rawurlencode('افلام عربي'),
+                'order'  => 'id.desc',
+                'limit'  => 2
+            ])['data']
+        );
 
         $latest_added = array_merge(
             Supabase::table('movies')->all([
