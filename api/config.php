@@ -19,6 +19,8 @@ define('SUPABASE_DATABASES', [
             "series",
             "dramacafe",
             "turkish_series",
+            "plays",
+            "arabic_movies"
         ]
     ],
     [
