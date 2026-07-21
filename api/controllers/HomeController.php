@@ -25,6 +25,8 @@ class HomeController
             'limit'    => 2,
         ])['data']);
 
+        print_r($hero);
+
         $latest_added = array_merge(
             Supabase::table('movies')->all([
                 'select' => '*',
