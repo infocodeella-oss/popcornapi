@@ -8,11 +8,11 @@ class HomeController
     {
 
         $hero = array_merge(Supabase::table('movies')->all([
-            'select' => '*',
-            'order'  => 'id.desc',
-            'limit'  => 2,
-            'details'   => 'neq.',
-        ])['data']);
+                'select' => '*',
+                'order'  => 'id.desc',
+                'cover'   => 'neq.',
+                'limit'  => 4
+            ])['data']);
 
         // $hero = array_merge(Supabase::table('movies')->all([
         //     'select' => '*',
