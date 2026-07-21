@@ -6,14 +6,12 @@ $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
 $segments = array_values(array_filter(explode('/', $path)));
 
-// لو فيه api فى المسار احذفها
 $apiIndex = array_search('api', $segments);
 
 if ($apiIndex !== false) {
     $segments = array_slice($segments, $apiIndex + 1);
 }
 
-// لو فيه v1 احذفها
 if (!empty($segments) && $segments[0] === 'v1') {
     array_shift($segments);
 }

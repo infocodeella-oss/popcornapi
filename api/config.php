@@ -18,6 +18,7 @@ define('SUPABASE_DATABASES', [
             "movies",
             "series",
             "dramacafe",
+            "turkish_series",
         ]
     ],
     [
@@ -30,6 +31,7 @@ define('SUPABASE_DATABASES', [
         "tables" => [
             "movies",
             "series",
+            "turkish_series",
         ]
     ],
 
